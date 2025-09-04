@@ -17,7 +17,7 @@ interface PastDuePayment {
   student: {
     name: string;
     grade: number;
-  };
+  }[];
 }
 
 interface StudentPaymentSummary {
@@ -86,8 +86,8 @@ export default function MissingPastPage() {
       if (!summaryMap.has(key)) {
         summaryMap.set(key, {
           student_id: payment.student_id,
-          student_name: payment.student?.name || "",
-          grade: payment.student?.grade || 0,
+          student_name: payment.student?.[0]?.name || "",
+          grade: payment.student?.[0]?.grade || 0,
           missing_months: [],
           total_amount_due: 0,
           months_behind: 0,
@@ -131,7 +131,7 @@ export default function MissingPastPage() {
   };
 
   const filteredPayments = pastDuePayments.filter((payment) =>
-    payment.student?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    payment.student?.[0]?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredSummaries = studentSummaries.filter((summary) =>
@@ -383,12 +383,12 @@ export default function MissingPastPage() {
                         <tr key={payment.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
-                              {payment.student?.name}
+                              {payment.student?.[0]?.name}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              Grade {payment.student?.grade}
+                              Grade {payment.student?.[0]?.grade}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
