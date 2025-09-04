@@ -17,7 +17,7 @@ interface MissingPayment {
   student: {
     name: string;
     grade: number;
-  };
+  }[];
 }
 
 export default function MissingCurrentPage() {
@@ -69,7 +69,7 @@ export default function MissingCurrentPage() {
   }, []);
 
   const filteredPayments = missingPayments.filter((payment) =>
-    payment.student?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    payment.student?.[0]?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalMissingAmount = filteredPayments.reduce((sum, payment) => sum + payment.total_amount, 0);
@@ -165,12 +165,12 @@ export default function MissingCurrentPage() {
                       <tr key={payment.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
-                            {payment.student?.name}
+                            {payment.student?.[0]?.name}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            Grade {payment.student?.grade}
+                            Grade {payment.student?.[0]?.grade}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
