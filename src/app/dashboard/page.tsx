@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { formatCurrency, getCurrentMonth, formatMonth } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PaymentStats {
   paid: number;
@@ -30,8 +30,7 @@ const COLORS = {
 };
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.email === 'mostanantachina@gmail.com';
+  const { user, isAdmin } = useAuth();
   
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());

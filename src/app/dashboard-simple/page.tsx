@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { formatCurrency, getCurrentMonth, formatMonth } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PaymentStats {
   paid: number;
@@ -17,7 +17,7 @@ interface PaymentStats {
 }
 
 export default function SimpleDashboardPage() {
-  const { data: session } = useSession();
+  const { user, isAdmin } = useAuth();
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
   const [paymentStats, setPaymentStats] = useState<PaymentStats>({
     paid: 0,
@@ -30,7 +30,6 @@ export default function SimpleDashboardPage() {
   });
   const [loading, setLoading] = useState(true);
   
-  const isAdmin = session?.user?.email === 'mostanantachina@gmail.com';
 
   const fetchMonthlyStats = async (month: string) => {
     try {

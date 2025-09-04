@@ -12,7 +12,7 @@ import {
   CogIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { signOut, useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -35,24 +35,21 @@ function classNames(...classes: string[]) {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const { user, loading, isAdmin, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  
-  // Simple admin check based on email
-  const isAdmin = session?.user?.email === 'mostanantachina@gmail.com';
   
   // Combine navigation based on admin status
   const navigation = isAdmin ? [...baseNavigation, ...adminOnlyNavigation] : baseNavigation;
 
   // Redirect to login if not authenticated
-  if (status === "unauthenticated") {
+  if (!loading && !user) {
     router.push("/login");
     return null;
   }
 
   // Show loading while checking session
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -213,7 +210,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-x-4">
                 <div className="text-right">
                   <div className="text-sm font-medium text-gray-900 flex items-center gap-2">
-                    {session?.user?.email}
+                    {user?.email}
                     {isAdmin && (
                       <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                         Admin
@@ -222,7 +219,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  onClick={() => signOut()}
                   className="text-sm font-medium text-gray-700 hover:text-gray-900"
                 >
                   Sign out

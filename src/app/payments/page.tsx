@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { formatCurrency, getCurrentMonth, formatMonth, calculateLateFee } from "@/lib/utils";
 import { generateReceiptPDF, printReceipt } from "@/lib/receiptGenerator";
 import { exportPaidStudents, exportUnpaidStudents, exportAllStudentsWithStatus, exportByGrade } from "@/lib/excelExport";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Student {
   id: string;
@@ -42,8 +42,7 @@ interface FeeSettings {
 }
 
 export default function PaymentsPage() {
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.email === 'mostanantachina@gmail.com';
+  const { user, isAdmin } = useAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [feeSettings, setFeeSettings] = useState<FeeSettings[]>([]);

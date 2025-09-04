@@ -1,18 +1,16 @@
-import { withAuth } from "next-auth/middleware";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default withAuth(
-  function middleware(req) {
-    // Add any additional middleware logic here if needed
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-  }
-);
+export async function middleware(req: NextRequest) {
+  // Since we're handling auth state on the client side now,
+  // we'll keep middleware minimal and rely on client-side redirects
+  // This avoids dependency on auth-helpers-nextjs which may not be available
+  
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|login).*)",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

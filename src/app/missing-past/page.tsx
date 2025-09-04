@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { ClockIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, getCurrentMonth, formatMonth } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 interface PastDuePayment {
@@ -30,12 +30,11 @@ interface StudentPaymentSummary {
 }
 
 export default function MissingPastPage() {
-  const { data: session } = useSession();
+  const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const isAdmin = session?.user?.email === 'mostanantachina@gmail.com';
 
   // Redirect non-admin users
-  if (session && !isAdmin) {
+  if (user && !isAdmin) {
     router.push("/dashboard-simple");
     return null;
   }

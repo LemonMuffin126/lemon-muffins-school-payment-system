@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { ExclamationTriangleIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { supabase } from "@/lib/supabase";
 import { formatCurrency, getCurrentMonth, formatMonth, isPaymentLate } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 interface MissingPayment {
@@ -21,9 +21,8 @@ interface MissingPayment {
 }
 
 export default function MissingCurrentPage() {
-  const { data: session } = useSession();
+  const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const isAdmin = session?.user?.email === 'mostanantachina@gmail.com';
   
   const [missingPayments, setMissingPayments] = useState<MissingPayment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +30,7 @@ export default function MissingCurrentPage() {
   const currentMonth = getCurrentMonth();
 
   // Redirect non-admin users
-  if (session && !isAdmin) {
+  if (user && !isAdmin) {
     router.push("/dashboard-simple");
     return null;
   }

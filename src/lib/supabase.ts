@@ -14,12 +14,19 @@ if (!isBuildTime && (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_
   );
 }
 
-// Use service role key for bypassing RLS when using NextAuth
-export const supabase = supabaseServiceRoleKey 
+// Client for authentication and regular operations
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
+
+// Admin client for operations requiring service role key
+export const supabaseAdmin = supabaseServiceRoleKey 
   ? createClient(supabaseUrl, supabaseServiceRoleKey)
   : createClient(supabaseUrl, supabaseAnonKey);
-
-export const supabaseAdmin = supabase;
 
 export type Database = {
   public: {

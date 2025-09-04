@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -12,10 +13,11 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string) => Promise<boolean>;
-  signOut: () => void;
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,11 +32,12 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (email: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('users')
         .select('*')
         .eq('email', email)
@@ -52,50 +55,80 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signIn = async (email: string): Promise<boolean> => {
+  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // For demo purposes, we'll use a simple email-based auth
-      // In production, you'd integrate with your actual auth system
-      const userData = await fetchUserRole(email);
-      
-      if (userData) {
-        setUser(userData);
-        localStorage.setItem('currentUserEmail', email);
-        return true;
-      } else {
-        alert('User not found or no access granted');
-        return false;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
       }
+
+      if (data.user && data.session) {
+        const userData = await fetchUserRole(data.user.email!);
+        if (userData) {
+          setUser(userData);
+          setSession(data.session);
+          return { success: true };
+        } else {
+          await supabase.auth.signOut();
+          return { success: false, error: 'User not found or no access granted' };
+        }
+      }
+
+      return { success: false, error: 'Authentication failed' };
     } catch (error) {
       console.error('Sign in error:', error);
-      return false;
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('currentUserEmail');
+    setSession(null);
   };
 
   useEffect(() => {
-    // Check for existing session
-    const savedEmail = localStorage.getItem('currentUserEmail');
-    if (savedEmail) {
-      fetchUserRole(savedEmail).then((userData) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchUserRole(session.user.email!).then((userData) => {
+          if (userData) {
+            setUser(userData);
+          }
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        const userData = await fetchUserRole(session.user.email!);
         if (userData) {
           setUser(userData);
         } else {
-          localStorage.removeItem('currentUserEmail');
+          setUser(null);
         }
-        setLoading(false);
-      });
-    } else {
+      } else {
+        setUser(null);
+      }
       setLoading(false);
-    }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const value: AuthContextType = {
     user,
+    session,
     isAdmin: user?.role === 'admin',
     loading,
     signIn,
