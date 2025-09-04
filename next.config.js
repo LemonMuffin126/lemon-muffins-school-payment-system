@@ -4,13 +4,13 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Enable experimental features
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
-  },
   // Environment variables
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  },
+  // Optimize for Cloudflare Pages
+  experimental: {
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
 }
 

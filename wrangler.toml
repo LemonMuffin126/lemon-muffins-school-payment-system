@@ -1,0 +1,9 @@
+name = "school-payment-system"
+compatibility_date = "2024-01-01"
+
+# Pages configuration - Next.js outputs to .next
+pages_build_output_dir = ".next"
+
+[build]
+command = "npm run build:cf"
+cwd = "."

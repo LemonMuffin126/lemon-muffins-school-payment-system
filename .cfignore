@@ -1,0 +1,20 @@
+# Exclude cache and large files from Cloudflare Pages deployment
+.next/cache/
+node_modules/
+.git/
+.env*
+*.log
+.DS_Store
+README.md
+*.md
+src/
+public/
+components/
+lib/
+types/
+styles/
+*.config.js
+*.config.ts
+package*.json
+tsconfig.json
+tailwind.config.js
