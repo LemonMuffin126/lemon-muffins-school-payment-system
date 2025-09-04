@@ -398,7 +398,7 @@ export default function PaymentsPage() {
       
     } catch (error) {
       console.error("Error marking payment as unpaid:", error);
-      alert(`❌ ERROR\n\nFailed to mark payment as unpaid.\nError: ${error.message || error}\n\nPlease try again.`);
+      alert(`❌ ERROR\n\nFailed to mark payment as unpaid.\nError: ${error instanceof Error ? error.message : String(error)}\n\nPlease try again.`);
     }
   };
 

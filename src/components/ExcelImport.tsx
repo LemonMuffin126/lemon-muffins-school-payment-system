@@ -160,7 +160,7 @@ export default function ExcelImport({ onImportComplete, onClose }: ExcelImportPr
         setPreview(parsedData);
       } catch (error) {
         console.error('Excel parsing error:', error);
-        alert(`Error reading Excel file: ${error.message}`);
+        alert(`Error reading Excel file: ${error instanceof Error ? error.message : String(error)}`);
       }
     };
 
@@ -208,7 +208,7 @@ export default function ExcelImport({ onImportComplete, onClose }: ExcelImportPr
                 grade: studentData.grade,
                 monthly_fee: studentData.monthly_fee,
                 registration_fee: 500, // Default registration fee
-                late_fee_rate: studentData.grade <= 6 ? 50 : 100 // Default late fee
+                late_fee_rate: Number(studentData.grade) <= 6 ? 50 : 100 // Default late fee
               }], { onConflict: 'grade' });
             
             if (feeError) {
@@ -219,7 +219,7 @@ export default function ExcelImport({ onImportComplete, onClose }: ExcelImportPr
       } catch (error) {
         results.errors.push({
           row: i + 1,
-          error: error.message || 'Unknown error',
+          error: error instanceof Error ? error.message : 'Unknown error',
           data: studentData
         });
       }

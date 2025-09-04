@@ -128,7 +128,7 @@ export default function StudentsPage() {
       });
     } catch (error) {
       console.error("Error adding student:", error);
-      alert(`Error adding student: ${error.message || JSON.stringify(error)}`);
+      alert(`Error adding student: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     }
   };
 
@@ -171,7 +171,7 @@ export default function StudentsPage() {
       });
     } catch (error) {
       console.error("Error updating student:", error);
-      alert(`Error updating student: ${error.message || JSON.stringify(error)}`);
+      alert(`Error updating student: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     }
   };
 
@@ -189,7 +189,7 @@ export default function StudentsPage() {
       setStudents(students.filter((s) => s.id !== studentId));
     } catch (error) {
       console.error("Error deleting student:", error);
-      alert(`Error deleting student: ${error.message || JSON.stringify(error)}`);
+      alert(`Error deleting student: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     }
   };
 
