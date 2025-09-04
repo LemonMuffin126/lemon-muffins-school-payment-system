@@ -194,7 +194,7 @@ export default function PaymentsPage() {
     } catch (error) {
       console.error("Error fetching payments for month:", error);
       // Show user-friendly error message
-      if (error.message && error.message.includes('column "monthly_fee" does not exist')) {
+      if (error instanceof Error && error.message && error.message.includes('column "monthly_fee" does not exist')) {
         alert("Database error: monthly_fee column is missing. Please run the database update SQL script.");
       }
     }
